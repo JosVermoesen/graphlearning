@@ -196,6 +196,8 @@ static void drawText()
     set_cursor(4 * canvas_width() / 5, ((bpp <= 2) ? 25 : 18) + canvas_height() / 4);
     sprintf(msg, "%ux%u", canvas_width(), canvas_height());
     draw_string(msg);
+    draw_string("\n\n\n\n01234567890123456789012345678901234567890123456789");
+    
 
     // draw prompt to continue
     set_text_multiplier((bpp <= 2) ? 3 : 1);
@@ -333,7 +335,8 @@ void main()
 
     erase_canvas();
     drawText();
-    draw_string("\n\nHello World!");
+    draw_string("\n\n\nHello World!\n");
+    draw_string("\n01234567890123456789012345678901234");
     anyKey();
 
     /* // plane=0, canvas=4, w=640, h=360, bpp2
