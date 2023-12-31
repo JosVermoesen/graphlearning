@@ -267,6 +267,61 @@ static void drawText()
     }
 }
 
+void anyKey()
+{
+    // Although completely unnecessary here, I've included an example
+    // of keypress detection. After the final screen, you can see
+    // the key events in the serial terminal, and experiment until
+    // you get bored and exit by pressing the ESC key. Have fun!
+
+    // wait for a keypress
+    xreg_ria_keyboard(KEYBORD_INPUT);
+    RIA.addr0 = KEYBORD_INPUT;
+    RIA.step0 = 0;
+    while (1)
+    {
+        uint8_t i;
+
+        // fill the keystates bitmask array
+        for (i = 0; i < KEYBOARD_BYTES; i++)
+        {
+            uint8_t j, new_keys;
+            RIA.addr0 = KEYBORD_INPUT + i;
+            new_keys = RIA.rw0;
+            ///*
+            // check for change in any and all keys
+            for (j = 0; j < 8; j++)
+            {
+                uint8_t new_key = (new_keys & (1 << j));
+                if ((((i << 3) + j) > 3) && (new_key != (keystates[i] & (1 << j))))
+                {
+                    printf("key %d %s\n", ((i << 3) + j), (new_key ? "pressed" : "released"));
+                }
+            }
+            //*/
+            keystates[i] = new_keys;
+        }
+
+        // check for a key down
+        if (!(keystates[0] & 1))
+        {
+            if (!handled_key)
+            { // handle only once per single keypress
+                // handle the keystrokes
+                if (key(KEY_ESC))
+                {
+                    break;
+                }
+                handled_key = true;
+            }
+        }
+        else
+        { // no keys down
+            handled_key = false;
+        }
+    }
+}
+
 void main()
 {
     _randomize();
@@ -278,6 +333,8 @@ void main()
 
     erase_canvas();
     drawText();
+    draw_string("\n\nHello World!");
+    anyKey();
 
     /* // plane=0, canvas=4, w=640, h=360, bpp2
     init_bitmap_graphics(0xFF00, 0x0000, 0, 4, 640, 360, 2);
